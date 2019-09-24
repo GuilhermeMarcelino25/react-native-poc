@@ -5,8 +5,8 @@
  * @format
  * @flow
  */
-
-import React, {Fragment} from 'react';
+import React, {Fragment, Component} from 'react';
+import Post from './component/Post';
 import {
   SafeAreaView,
   StyleSheet,
@@ -15,7 +15,8 @@ import {
   Text,
   StatusBar,
   Image,
-  Dimensions
+  Dimensions,
+  FlatList
 } from 'react-native';
 
 import {
@@ -26,19 +27,43 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-const App = () => {
 
-  const width = Dimensions.get('screen').width;
-  return (
-<View>
-    <Text>Guilherme</Text>
-    <Image source={require('./alura.jpg')} style={{width:width, height:width}}/>
-</View>
-  );
+
+export default class App extends Component {
+
+  constructor(){
+    super();
+    this.state = {
+      fotos: []
+    }
+  }
+
+  componentDidMount() {
+    fetch('https://instalura-api.herokuapp.com/api/public/fotos/rafael')
+        .then(resposta => resposta.json())
+        .then(json => this.setState({fotos: json}));
+}
+  
+
+ 
+  render() {
+    const width = Dimensions.get('screen').width;
+      return (
+        <FlatList style={styles.container}
+        data={this.state.fotos}
+        keyExtractor={item => item.id}
+        renderItem={ ({item}) => 
+        <Post foto={item}/>
+        }
+      />
+      );
+  }
 };
 
 const styles = StyleSheet.create({
 
-});
+  container: {
+    marginTop: 20
+  }
 
-export default App;
+});
