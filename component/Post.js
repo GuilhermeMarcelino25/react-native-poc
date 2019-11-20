@@ -7,7 +7,8 @@ import {
   Image,
   Dimensions,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  TextInput
 } from 'react-native';
 
 
@@ -72,12 +73,32 @@ export default class Post extends Component {
 
   }
 
+  comentar(){
+    if(this.state.valorComentario === '')
+                return;
+
+            const novaLista = [...this.state.foto.comentarios, {
+                id: this.state.valorComentario,
+                login: 'Guilherme',
+                texto: this.state.valorComentario,
+            }];
+
+            const fotoAtualizada = {
+                ...this.state.foto,
+                comentarios: novaLista,
+            }
+
+            this.setState({foto: fotoAtualizada});
+            this.inputComentario.clear();
+   
+    }
+
     render() {
       const {foto} = this.state;
 
      return (
-                <View>
-                    <View style= {styles.cabecalho}>  
+                <View key={foto.id}  >
+                    <View style= {styles.cabecalho}> 
                       <Image source={{uri: foto.urlPerfil}} style={styles.fotoDePerfil} />
                       <Text>{foto.loginUsuario}</Text>
                     </View>    
@@ -89,8 +110,21 @@ export default class Post extends Component {
                       </TouchableOpacity>
                       {this.mostrarLikers(foto.likers)}
                       {this.exibeLegenda(foto)}
-                        
-                      </View>                            
+                      {foto.comentarios.map(comentario =>
+                      <View key={comentario.id} style={styles.comentarios}>
+                      <Text style ={styles.tituloComentario}>{comentario.login}</Text>
+                      <Text>{comentario.texto}</Text>
+                      </View>
+                      )}
+                      <View style={styles.comentarioAmigos}>
+                      <TextInput style={styles.input} placeholder = "Digite um comentario" 
+                      ref={input => this.inputComentario = input}
+                      onChangeText={texto => this.setState({valorComentario: texto})}/>
+                      <TouchableOpacity onPress={this.comentar.bind(this)}>
+                      <Image source={require('../resource/img/send.png')} style={styles.botaoComentario}/>
+                      </TouchableOpacity>
+                      </View>
+                      </View>
                 </View>
         );
     }
@@ -136,6 +170,28 @@ const styles = StyleSheet.create({
     tituloComentario :{
       fontWeight: 'bold',
       marginRight: 5
+    },
+
+    comentarios:{
+      flexDirection: 'row',
+      alignItems: 'center'
+    },
+
+    comentarioAmigos: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: '#ddd'
+    },
+
+    input:{
+      flex: 1,
+      height: 40
+    },
+
+    botaoComentario:{
+      width:30,
+      height:30
     }
   
   });
